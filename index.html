@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de IVA - España 21%</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #667eea;
+            font-size: 16px;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .tab:hover:not(.active) {
+            background: #e0e0e0;
+        }
+
+        .calculator-section {
+            display: none;
+        }
+
+        .calculator-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 15px 40px 15px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .currency-symbol {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            font-weight: 600;
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .calculate-btn:active {
+            transform: translateY(0);
+        }
+
+        .results {
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%);
+            border-radius: 15px;
+            border-left: 4px solid #667eea;
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+            animation: slideDown 0.4s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e0e0ff;
+        }
+
+        .result-row:last-child {
+            border-bottom: none;
+            padding-top: 15px;
+            margin-top: 5px;
+            border-top: 2px solid #667eea;
+        }
+
+        .result-label {
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .result-value {
+            color: #333;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .result-row:last-child .result-value {
+            color: #667eea;
+            font-size: 22px;
+        }
+
+        .info-box {
+            margin-top: 25px;
+            padding: 15px;
+            background: #fff9e6;
+            border-left: 4px solid #ffc107;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .info-box strong {
+            color: #333;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .result-value {
+                font-size: 16px;
+            }
+
+            .result-row:last-child .result-value {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Calculadora de IVA</h1>
+        <p class="subtitle">IVA España - 21%</p>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('add')">Añadir IVA</button>
+            <button class="tab" onclick="switchTab('remove')">Quitar IVA</button>
+        </div>
+
+        <!-- Sección: Añadir IVA -->
+        <div id="add-section" class="calculator-section active">
+            <div class="input-group">
+                <label for="base-amount">Base Imponible</label>
+                <div class="input-wrapper">
+                    <input type="number" id="base-amount" placeholder="Introduce la cantidad" step="0.01" min="0">
+                    <span class="currency-symbol">€</span>
+                </div>
+            </div>
+            <button class="calculate-btn" onclick="calculateAddVAT()">Calcular IVA</button>
+
+            <div id="add-results" class="results">
+                <div class="result-row">
+                    <span class="result-label">Base Imponible:</span>
+                    <span class="result-value" id="add-base">0,00 €</span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">IVA (21%):</span>
+                    <span class="result-value" id="add-vat">0,00 €</span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">TOTAL:</span>
+                    <span class="result-value" id="add-total">0,00 €</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección: Quitar IVA -->
+        <div id="remove-section" class="calculator-section">
+            <div class="input-group">
+                <label for="total-amount">Total con IVA</label>
+                <div class="input-wrapper">
+                    <input type="number" id="total-amount" placeholder="Introduce la cantidad" step="0.01" min="0">
+                    <span class="currency-symbol">€</span>
+                </div>
+            </div>
+            <button class="calculate-btn" onclick="calculateRemoveVAT()">Calcular Base</button>
+
+            <div id="remove-results" class="results">
+                <div class="result-row">
+                    <span class="result-label">Base Imponible:</span>
+                    <span class="result-value" id="remove-base">0,00 €</span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">IVA (21%):</span>
+                    <span class="result-value" id="remove-vat">0,00 €</span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">TOTAL:</span>
+                    <span class="result-value" id="remove-total">0,00 €</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <strong>Nota:</strong> El IVA general en España es del 21%. También existen tipos reducidos del 10% y superreducidos del 4% según el producto o servicio.
+        </div>
+    </div>
+
+    <script>
+        const VAT_RATE = 0.21;
+
+        function switchTab(tab) {
+            // Cambiar tabs activas
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Cambiar secciones activas
+            const sections = document.querySelectorAll('.calculator-section');
+            sections.forEach(s => s.classList.remove('active'));
+
+            if (tab === 'add') {
+                document.getElementById('add-section').classList.add('active');
+            } else {
+                document.getElementById('remove-section').classList.add('active');
+            }
+
+            // Ocultar resultados
+            document.querySelectorAll('.results').forEach(r => r.classList.remove('show'));
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('es-ES', {
+                style: 'currency',
+                currency: 'EUR'
+            }).format(amount);
+        }
+
+        function calculateAddVAT() {
+            const baseAmount = parseFloat(document.getElementById('base-amount').value);
+
+            if (isNaN(baseAmount) || baseAmount < 0) {
+                alert('Por favor, introduce una cantidad válida');
+                return;
+            }
+
+            const vatAmount = baseAmount * VAT_RATE;
+            const totalAmount = baseAmount + vatAmount;
+
+            // Mostrar resultados
+            document.getElementById('add-base').textContent = formatCurrency(baseAmount);
+            document.getElementById('add-vat').textContent = formatCurrency(vatAmount);
+            document.getElementById('add-total').textContent = formatCurrency(totalAmount);
+            document.getElementById('add-results').classList.add('show');
+        }
+
+        function calculateRemoveVAT() {
+            const totalAmount = parseFloat(document.getElementById('total-amount').value);
+
+            if (isNaN(totalAmount) || totalAmount < 0) {
+                alert('Por favor, introduce una cantidad válida');
+                return;
+            }
+
+            const baseAmount = totalAmount / (1 + VAT_RATE);
+            const vatAmount = totalAmount - baseAmount;
+
+            // Mostrar resultados
+            document.getElementById('remove-base').textContent = formatCurrency(baseAmount);
+            document.getElementById('remove-vat').textContent = formatCurrency(vatAmount);
+            document.getElementById('remove-total').textContent = formatCurrency(totalAmount);
+            document.getElementById('remove-results').classList.add('show');
+        }
+
+        // Permitir calcular con Enter
+        document.getElementById('base-amount').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculateAddVAT();
+            }
+        });
+
+        document.getElementById('total-amount').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculateRemoveVAT();
+            }
+        });
+    </script>
+</body>
+</html>
