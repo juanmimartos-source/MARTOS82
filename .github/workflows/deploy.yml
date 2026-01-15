@@ -3,7 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - claude/spanish-vat-calculator-yey2w
+      - claude/memory-game-4SWUo
 
 permissions:
   contents: read
